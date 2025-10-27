@@ -244,23 +244,16 @@ class MSWSS(nn.Module):
                 ys[:, i * group_intervals: (i + 1) * group_intervals, :, :] = self.mfas(xi)
             else:
                 ys[:, i * group_intervals: (i + 1) * group_intervals, :, :] = self.mfas(xi)
-        #ys = ys[..., :-3]
-        #average fusion
         y_fused = (ys + ym + yl) / 3
         interpolate = self.res_conv(F.interpolate(
             x, scale_factor=(self.step_scale), mode='bicubic'
         ))
-        #y = self.spectral_superresolution1(self.mfa(y_fused))
-        #print("interpolate:", interpolate.size())
-        #pdb.set_trace()
-        #y = self.spectral_superresolution1(self.mfa(y_fused))
-        y = self.spectral_superresolution1(self.mfa(y_fused)) + interpolate # torch.Size([BS, 128, 64, 2])
-        #print("y:", y.size())
-        #pdb.set_trace()
+        y = self.spectral_superresolution1(self.mfa(y_fused)) + interpolate
+
         res = self.wt_superresolution(y)
         return self.srf(self.spatial_superresolution(res))
 
-class MWCNet(nn.Module): ###编码和解码网络
+class MWCNet(nn.Module):
     def __init__(self, num_bits: int = 32):
         super(MWCNet, self).__init__()
         self.encoder = TriSSA(in_channels=172, out_channels=27, num_bits=num_bits)
@@ -272,31 +265,3 @@ class MWCNet(nn.Module): ###编码和解码网络
 
 
 
-if __name__ == '__main__':
-    device = 'cuda:2'
-    x = torch.randn(8, 172, 128, 4).to(device)
-    # model = FocusCompressMethod(27, 172, scale=4).to(device)
-    # model = FocusEncoder(172, 27).to(device)
-    model = MWCNet(num_bits=32).to(device)
-    total_param = sum([param.numel() for param in model.encoder.parameters()])
-    print(total_param)
-    print(model(x).shape)
-    print(model(x))
-    # print(model.encoder.spacial_attention.conv.weight)
-    spacial_attention = SpacialAttention(num_bits=32).to(device)
-    print(spacial_attention(x).shape)
-    # for name, param in model.named_parameters():
-    #     print(name)
-    #     print(param.shape)
-    #state = torch.load('./f2dcn_param/F2DCN_32_bit_12960_epoch.pth')
-    state = torch.load('./f2dcnwy_param/F2DCN_32_bit_12960_epoch.pth')
-    model.load_state_dict(state, strict=False)
-    for key in state.keys():
-        if 'encoder.spacial_attension' in key:
-            print(key)
-    model.encoder.spacial_attention.load_state_dict({
-        'conv.weight':
-            state['encoder.spacial_attension.conv.weight'],
-        'conv.bias':
-            state['encoder.spacial_attension.conv.bias'],
-    })
