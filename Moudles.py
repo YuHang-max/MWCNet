@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
-from Tools.FCA import TripletAttention
+from Tools.FCA import *
 from Tools.SGFN import SGFN
 from Tools.MAB import *
 from Tools.DSConv2d import DepthwiseSeparableConvWithWTConv2d
