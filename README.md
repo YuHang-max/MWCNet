@@ -15,5 +15,10 @@ and enhances spatial-spectral resolution using wavelet decomposition.
 * python 3.8 
 * Pytorch 1.6 
 
+## Datasets
+Data address: https://aviris.jpl.nasa.gov/dataportal/.
+
+After downloading, save it to the dataset folder.
+
 ## Training and Testing
 The paper is currently under review. Once accepted, the test code and weight file will be released.

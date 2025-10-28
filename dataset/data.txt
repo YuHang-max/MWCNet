@@ -1,0 +1,3 @@
+Data address: https://aviris.jpl.nasa.gov/dataportal/.
+
+After downloading, save it to the dataset folder
