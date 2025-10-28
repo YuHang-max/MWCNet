@@ -13,14 +13,9 @@ from Tools.FCM import SuperResolutionBlock
 
 class TriSSA(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, num_bits: int = 32):
-        """
-         ---> Channel Attention --->                 ---> Spacial Attention --->
-        |                         |                 |                         |
-        x ---------------------> * ---> Conv2d ---> -----------------------> * ---> Conv2d ---> (activate) ---> y
-        """
         super(TriSSA, self).__init__()
         self.TriSSA = TripletAttention()
-        self.channel_attention = ChannelAttention(in_channels=in_channels, num_bits=num_bits)
+        self.spectral_attention = ChannelAttention(in_channels=in_channels, num_bits=num_bits)
         self.spacial_attention = SpacialAttention(num_bits=num_bits)
         assert 0 < num_bits <= 32
         self.num_bits = num_bits
@@ -45,9 +40,9 @@ class TriSSA(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.TriSSA(x)
-        y = self.channel_compress(self.channel_attention(x))
+        y = self.channel_compress(self.spectral_attention(x))
         if self.num_bits == 32:
-            return self.spacial_compress(self.spacial_attention(y)) ## torch.Size[1440, 27, 32, 1]
+            return self.spacial_compress(self.spacial_attention(y))
         else:
             return self.activate(
                 self.spacial_compress(self.spacial_attention(y))
