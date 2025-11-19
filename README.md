@@ -20,5 +20,3 @@ Data address: https://aviris.jpl.nasa.gov/dataportal/.
 
 After downloading, save it to the dataset folder.
 
-## Training and Testing
-The paper is currently under review. Once accepted, the test code and weight file will be released.
